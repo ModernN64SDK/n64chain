@@ -21,7 +21,6 @@ numproc=`getnumproc`
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.gz"
-MAKE="ftp://ftp.gnu.org/gnu/make/make-4.2.1.tar.bz2"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
@@ -143,71 +142,6 @@ if [ ! -f stamps/gcc-install ]; then
   popd
 
   touch stamps/gcc-install
-fi
-
-if [ ! -f stamps/make-download ]; then
-  wget "${MAKE}" -O "tarballs/$(basename ${MAKE})"
-  touch stamps/make-download
-fi
-
-if [ ! -f stamps/make-extract ]; then
-  mkdir -p make-{build,source}
-  tar -xf tarballs/$(basename ${MAKE}) -C make-source --strip 1
-  touch stamps/make-extract
-fi
-
-if [ ! -f stamps/make-patch ]; then
-  pushd make-source
-  patch -p1 -i ../make-*.patch
-  popd
-  touch stamps/make-patch
-fi
-
-if [ ! -f stamps/make-configure ]; then
-  pushd make-build
-  ../make-source/configure \
-    --prefix="${SCRIPT_DIR}" \
-    --disable-largefile \
-    --disable-nls \
-    --disable-rpath
-  popd
-
-  touch stamps/make-configure
-fi
-
-if [ ! -f stamps/make-build ]; then
-  pushd make-build
-  make -j${numproc}
-  popd
-
-  touch stamps/make-build
-fi
-
-if [ ! -f stamps/make-install ]; then
-  pushd make-build
-  make install
-  popd
-
-  touch stamps/make-install
-fi
-
-if [ ! -f stamps/checksum-build ]; then
-  cc -Wall -Wextra -pedantic -std=c99 -O2 checksum.c -o bin/checksum
-
-  touch stamps/checksum-build
-fi
-
-if [ ! -f stamps/mkfs-build ]; then
-  cc -Wall -Wextra -pedantic -std=c99 -O2 mkfs.c -o bin/mkfs
-
-  touch stamps/mkfs-build
-fi
-
-if [ ! -f stamps/rspasm-build ]; then
-  pushd "${SCRIPT_DIR}/../rspasm"
-
-  make clean && make all -j${numproc}
-  cp rspasm ${SCRIPT_DIR}/bin
 fi
 
 rm -rf "${SCRIPT_DIR}"/../tools/tarballs
