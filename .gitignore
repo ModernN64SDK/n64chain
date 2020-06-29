@@ -1,20 +1,10 @@
-/doc/n64chain-doc.aux
-/doc/n64chain-doc.log
-/doc/n64chain-doc.pdf
-
-/rspasm/lexer.c
-/rspasm/lexer.h
-/rspasm/parser.c
-/rspasm/parser.h
-/rspasm/rspasm
-
-/tools/bin
-/tools/include
-/tools/lib
-/tools/libexec
-/tools/mips64-elf
-/tools/share
-/tools/*-linux-gnu
+bin
+include
+lib
+libexec
+mips64-elf
+share
+*-linux-gnu
 
 *.a
 *.bin

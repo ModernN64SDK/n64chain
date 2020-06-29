@@ -144,9 +144,9 @@ if [ ! -f stamps/gcc-install ]; then
   touch stamps/gcc-install
 fi
 
-rm -rf "${SCRIPT_DIR}"/../tools/tarballs
-rm -rf "${SCRIPT_DIR}"/../tools/*-source
-rm -rf "${SCRIPT_DIR}"/../tools/*-build
-rm -rf "${SCRIPT_DIR}"/../tools/stamps
+rm -rf "${SCRIPT_DIR}"/tarballs
+rm -rf "${SCRIPT_DIR}"/*-source
+rm -rf "${SCRIPT_DIR}"/*-build
+rm -rf "${SCRIPT_DIR}"/stamps
 exit 0
 
