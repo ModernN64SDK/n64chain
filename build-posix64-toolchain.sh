@@ -21,6 +21,8 @@ numproc=`getnumproc`
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.1.0/gcc-10.1.0.tar.gz"
+NEWLIB="ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz"
+
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
@@ -152,7 +154,22 @@ make all-target-libgcc CC_FOR_TARGET=$N64_TOOLCHAIN/mips64-elf-gcc CFLAGS_FOR_TA
 
 make install-target-libgcc
 
+cd ..
+
+wget ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz
+
+test -d newlib-3.3.0 || tar -xzf newlib-3.3.0.tar.gz
+
+cd newlib-3.3.0
+CFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2" CXXFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2" ./configure --target=mips64-elf --prefix=${SCRIPT_DIR} --with-cpu=mips64vr4300 --disable-threads --disable-libssp --disable-werror
+make -j${numproc}
+make install
+
+cd ..
+
 rm -rf "${SCRIPT_DIR}"/tarballs
+rm "newlib-3.3.0.tar.gz"
+rm -rf newlib-3.3.0
 rm -rf "${SCRIPT_DIR}"/*-source
 rm -rf "${SCRIPT_DIR}"/*-build
 rm -rf "${SCRIPT_DIR}"/stamps

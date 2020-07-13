@@ -5,6 +5,7 @@ libexec
 mips64-elf
 share
 *-linux-gnu
+tarballs
 
 *.a
 *.bin
