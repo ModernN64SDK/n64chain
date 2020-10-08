@@ -20,7 +20,7 @@ which getconf >/dev/null 2>/dev/null && {
 numproc=`getnumproc`
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.1.0/gcc-10.1.0.tar.gz"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
 NEWLIB="ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz"
 
 
@@ -150,7 +150,7 @@ echo "" >> ./gcc-source/libgcc/config/mips/t-mips64
 
 cd gcc-build
 
-make all-target-libgcc CC_FOR_TARGET=$N64_TOOLCHAIN/mips64-elf-gcc CFLAGS_FOR_TARGET="-D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300"
+make all-target-libgcc CC_FOR_TARGET=${SCRIPT_DIR}/bin/mips64-elf-gcc CFLAGS_FOR_TARGET="-D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -G 0 -fno-PIC"
 
 make install-target-libgcc
 
@@ -161,7 +161,7 @@ wget ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz
 test -d newlib-3.3.0 || tar -xzf newlib-3.3.0.tar.gz
 
 cd newlib-3.3.0
-CFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2" CXXFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2" ./configure --target=mips64-elf --prefix=${SCRIPT_DIR} --with-cpu=mips64vr4300 --disable-threads --disable-libssp --disable-werror
+CFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2 -G 0 -fno-PIC" CXXFLAGS_FOR_TARGET="-mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -O2 -G 0 -fno-PIC" ./configure --target=mips64-elf --prefix=${SCRIPT_DIR} --with-cpu=mips64vr4300 --disable-threads --disable-libssp --disable-werror
 make -j${numproc}
 make install
 
