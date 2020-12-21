@@ -21,6 +21,7 @@ numproc=`getnumproc`
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
+NEWLIB="ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz"
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -149,13 +150,26 @@ echo "" >> ./gcc-source/libgcc/config/mips/t-mips64
 
 cd gcc-build
 
-make all-target-libgcc CC_FOR_TARGET=${SCRIPT_DIR}/bin/mips64-elf-gcc CFLAGS_FOR_TARGET="-D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -mabi=32 -march=vr4300 -mtune=vr4300 -mfix4300 -G 0 -fno-PIC"
+make all-target-libgcc CC_FOR_TARGET=${SCRIPT_DIR}/bin/mips64-elf-gcc CFLAGS_FOR_TARGET="-D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC"
 
 make install-target-libgcc
 
 cd ..
 
+wget ftp://sourceware.org/pub/newlib/newlib-3.3.0.tar.gz
+
+test -d newlib-3.3.0 || tar -xzf newlib-3.3.0.tar.gz
+
+cd newlib-3.3.0
+CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC" ./configure --target=mips64-elf --prefix=${SCRIPT_DIR} --with-cpu=mips64vr4300 --disable-threads --disable-libssp --disable-werror
+make -j${numproc}
+make install
+
+cd ..
+
 rm -rf "${SCRIPT_DIR}"/tarballs
+rm "newlib-3.3.0.tar.gz"
+rm -rf newlib-3.3.0
 rm -rf "${SCRIPT_DIR}"/*-source
 rm -rf "${SCRIPT_DIR}"/*-build
 rm -rf "${SCRIPT_DIR}"/stamps
