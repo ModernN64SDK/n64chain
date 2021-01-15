@@ -19,6 +19,12 @@ which getconf >/dev/null 2>/dev/null && {
 
 numproc=`getnumproc`
 
+
+# EDIT THIS LINE TO CHANGE YOUR INSTALL PATH!
+export INSTALL_PATH=${N64_CMP:-/usr/local}
+
+export PATH=$PATH:$INSTALL_PATH/bin
+
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
 
@@ -26,7 +32,6 @@ GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
 
-export PATH="${PATH}:${SCRIPT_DIR}/bin"
 
 if [ ! -f stamps/binutils-download ]; then
   wget "${BINUTILS}" -O "tarballs/$(basename ${BINUTILS})"
@@ -42,9 +47,10 @@ fi
 if [ ! -f stamps/binutils-configure ]; then
   pushd binutils-build
   ../binutils-source/configure \
-    --prefix="${SCRIPT_DIR}" \
-    --with-lib-path="${SCRIPT_DIR}/lib" \
+    --prefix="${INSTALL_PATH}" \
+    --with-lib-path="${INSTALL_PATH}/lib" \
     --target=mips64-elf --with-arch=vr4300 \
+    --program-prefix=mips-n64- \
     --enable-64-bit-bfd \
     --enable-plugins \
     --enable-shared \
@@ -69,7 +75,7 @@ fi
 
 if [ ! -f stamps/binutils-install ]; then
   pushd binutils-build
-  make install
+  make install || sudo make install || su -c "make install"
   popd
 
   touch stamps/binutils-install
@@ -89,11 +95,12 @@ fi
 if [ ! -f stamps/gcc-configure ]; then
   pushd gcc-build
   ../gcc-source/configure \
-    --prefix="${SCRIPT_DIR}" \
+    --prefix="${INSTALL_PATH}" \
     --target=mips64-elf --with-arch=vr4300 \
+    --program-prefix=mips-n64- \
     --enable-languages=c,c++ --without-headers --with-newlib \
-    --with-gnu-as=${SCRIPT_DIR}/bin/mips64-elf-as \
-    --with-gnu-ld=${SCRIPT_DIR}/bin/mips64-elf-ld \
+    --with-gnu-as=${INSTALL_PATH}/bin/mips-n64-as \
+    --with-gnu-ld=${INSTALL_PATH}/bin/mips-n64-ld \
     --enable-checking=release \
     --enable-shared \
     --enable-shared-libgcc \
@@ -133,13 +140,13 @@ fi
 
 if [ ! -f stamps/gcc-install ]; then
   pushd gcc-build
-  make install-gcc
+  make install-gcc || sudo make install-gcc || su -c "make install-gcc"
   popd
 
   # build-win32-toolchain.sh needs this; the cross-compiler build
   # will look for mips64-elf-cc and we only have mips64-elf-gcc.
-  pushd "${SCRIPT_DIR}/bin"
-  ln -sfv mips64-elf-{gcc,cc}
+  pushd "${INSTALL_PATH}/bin"
+  ln -sfv mips-n64-{gcc,cc} || sudo ln -sfv mips-n64-{gcc,cc} || su -c "ln -sfv mips-n64-{gcc,cc}"
   popd
 
   touch stamps/gcc-install
@@ -149,9 +156,9 @@ echo "" >> ./gcc-source/libgcc/config/mips/t-mips64
 
 cd gcc-build
 
-make all-target-libgcc CC_FOR_TARGET=${SCRIPT_DIR}/bin/mips64-elf-gcc CFLAGS_FOR_TARGET="-D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC"
+make all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC"
 
-make install-target-libgcc
+make install-target-libgcc || sudo make install-target-libgcc || su -c "make install-target-libgcc"
 
 cd ..
 
