@@ -21,7 +21,9 @@ numproc=`getnumproc`
 
 
 # EDIT THIS LINE TO CHANGE YOUR INSTALL PATH!
-export INSTALL_PATH=${N64_CMP:-/usr/local}
+export INSTALL_PATH=${N64_CMP:-/opt/crashsdk}
+
+mkdir -p $INSTALL_PATH || sudo mkdir -p $INSTALL_PATH || su -c "mkdir -p ${INSTALL_PATH}"
 
 export PATH=$PATH:$INSTALL_PATH/bin
 
@@ -75,7 +77,7 @@ fi
 
 if [ ! -f stamps/binutils-install ]; then
   pushd binutils-build
-  make install || sudo make install || su -c "make install"
+  make install-strip || sudo make install-strip || su -c "make install-strip"
   popd
 
   touch stamps/binutils-install
@@ -140,7 +142,7 @@ fi
 
 if [ ! -f stamps/gcc-install ]; then
   pushd gcc-build
-  make install-gcc || sudo make install-gcc || su -c "make install-gcc"
+  make install-strip-gcc || sudo make install-strip-gcc || su -c "make install-strip-gcc"
   popd
 
   # build-win32-toolchain.sh needs this; the cross-compiler build
