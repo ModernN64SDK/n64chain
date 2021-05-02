@@ -30,7 +30,7 @@ export PATH=$PATH:$INSTALL_PATH/bin
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
 
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.3.0/gcc-10.3.0.tar.gz"
 
 if [ ! -f stamps/gcc-download ]; then
   wget "${GCC}" -O "tarballs/$(basename ${GCC})"
@@ -95,7 +95,7 @@ cd gcc-build
 
 make -j${numproc} all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC"
 
-sudo checkinstall --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
+sudo checkinstall --pkgversion 10.3.0 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
 
 cp *.deb ../
 
