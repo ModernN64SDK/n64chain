@@ -28,7 +28,7 @@ mkdir -p $INSTALL_PATH || sudo mkdir -p $INSTALL_PATH || su -c "mkdir -p ${INSTA
 export PATH=$PATH:$INSTALL_PATH/bin
 
 BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.3.0/gcc-10.3.0.tar.gz"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-11.1.0/gcc-11.1.0.tar.gz"
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -143,7 +143,7 @@ fi
 
 if [ ! -f stamps/gcc-install ]; then
   pushd gcc-build
-  sudo checkinstall --pkgversion 10.3.0 --pkgname gcc-mips-n64 --install=no make install-strip-gcc
+  sudo checkinstall --pkgversion 11.1.0 --pkgname gcc-mips-n64 --install=no make install-strip-gcc
   cp *.deb ../
   popd
 
