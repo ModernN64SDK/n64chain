@@ -36,7 +36,7 @@ jobs:
     
     - name: Compress crashsdk folder
       run: |
-        tar -zcvf crashsdk.tar.gz crashsdk
+        tar -zcvf crashsdk.tar.gz /opt/crashsdk
     
     - uses: actions/upload-artifact@v2
       with:
