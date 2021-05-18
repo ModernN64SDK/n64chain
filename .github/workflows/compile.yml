@@ -34,18 +34,18 @@ jobs:
       id: slug
       run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
     
-    - name: Compress n64chain folder
+    - name: Compress crashsdk folder
       run: |
-        tar -zcvf n64chain.tar.gz ps2dev
+        tar -zcvf crashsdk.tar.gz crashsdk
     
     - uses: actions/upload-artifact@v2
       with:
-        name: n64chain-${{ steps.slug.outputs.sha8 }}-${{matrix.os}}
-        path: n64chain.tar.gz
+        name: crashsdk-${{ steps.slug.outputs.sha8 }}-${{matrix.os}}
+        path: crashsdk.tar.gz
     
-    - name: Rename n64chain.tar.gz file
+    - name: Rename crashsdk.tar.gz file
       run: |
-        mv n64chain.tar.gz n64chain-${{matrix.os}}.tar.gz
+        mv crashsdk.tar.gz crashsdk-${{matrix.os}}.tar.gz
 
     - name: Extract tag name
       if: startsWith(github.ref, 'refs/tags/')
@@ -56,7 +56,7 @@ jobs:
       if: github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v1
       with:
-        files: n64chain-${{matrix.os}}.tar.gz
+        files: crashsdk-${{matrix.os}}.tar.gz
         prerelease: true
         name: "Development build"
         tag_name: "latest"
