@@ -26,8 +26,8 @@ jobs:
     
     - name: Runs all the stages in the shell
       run: |
-        ./build-package.sh \
-        ./build-newlib-pkg.sh \
+        ./build-package.sh
+        ./build-newlib-pkg.sh
         ./build-libgcc-pkg.sh
 
     - name: Get short SHA
