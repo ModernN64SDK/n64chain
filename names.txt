@@ -1,4 +1,4 @@
 GNU binary utilities, for mips-n64 target
 GNU compiler for mips-n64 target
-GCC support library 
+GCC support library
 newlib C/C++ support libraries

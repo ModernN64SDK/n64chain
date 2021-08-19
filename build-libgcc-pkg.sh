@@ -30,7 +30,7 @@ export PATH=$PATH:$INSTALL_PATH/bin
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR} && mkdir -p {stamps,tarballs}
 
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-11.1.0/gcc-11.1.0.tar.gz"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.gz"
 
 if [ ! -f stamps/gcc-download ]; then
   wget "${GCC}" -O "tarballs/$(basename ${GCC})"
@@ -49,12 +49,11 @@ if [ ! -f stamps/gcc-configure ]; then
     --prefix="${INSTALL_PATH}" \
     --target=mips64-elf --with-arch=vr4300 \
     --program-prefix=mips-n64- \
-    --enable-languages=c,c++ --without-headers --with-newlib \
+    --enable-languages=c --without-headers --without-newlib \
     --with-gnu-as=${INSTALL_PATH}/bin/mips-n64-as \
     --with-gnu-ld=${INSTALL_PATH}/bin/mips-n64-ld \
     --enable-checking=release \
-    --enable-shared \
-    --enable-shared-libgcc \
+    --disable-shared \
     --disable-decimal-float \
     --disable-gold \
     --disable-libatomic \
@@ -69,7 +68,6 @@ if [ ! -f stamps/gcc-configure ]; then
     --disable-multilib \
     --disable-nls \
     --disable-rpath \
-    --disable-static \
     --disable-threads \
     --disable-win32-registry \
     --enable-lto \
@@ -93,9 +91,9 @@ echo "" >> ./gcc-source/libgcc/config/mips/t-mips64
 
 cd gcc-build
 
-make -j${numproc} all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC"
+make -j${numproc} all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -O2"
 
-sudo checkinstall --pkgversion 11.1.0 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
+sudo checkinstall --pkgversion 11.2.0 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
 
 cp *.deb ../
 
