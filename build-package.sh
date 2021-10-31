@@ -28,7 +28,7 @@ mkdir -p $INSTALL_PATH || sudo mkdir -p $INSTALL_PATH || su -c "mkdir -p ${INSTA
 
 export PATH=$PATH:$INSTALL_PATH/bin
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.bz2"
 GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.gz"
 
 
@@ -78,7 +78,7 @@ fi
 
 if [ ! -f stamps/binutils-install ]; then
   pushd binutils-build
-  sudo checkinstall --pkgversion 2.30-1 --pkgname binutils-mips-n64 --install=no make install-strip
+  sudo checkinstall --pkgversion 2.37 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
   cp *.deb ../
   popd
 
@@ -142,7 +142,7 @@ fi
 
 if [ ! -f stamps/gcc-install ]; then
   pushd gcc-build
-  sudo checkinstall --pkgversion 11.2.0 --pkgname gcc-mips-n64 --install=no make install-strip-gcc
+  sudo checkinstall --pkgversion 11.2.0-2 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip-gcc
   cp *.deb ../
   popd
 
@@ -155,7 +155,7 @@ cd gcc-build
 
 make -j${numproc} all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -O2"
 
-sudo checkinstall --pkgversion 11.2.0 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
+sudo checkinstall --pkgversion 11.2.0-2 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
 
 cp *.deb ../
 
