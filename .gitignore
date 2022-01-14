@@ -24,3 +24,4 @@ tarballs
 # macOS Garbage
 .DS_Store
 ._*
+*.deb
