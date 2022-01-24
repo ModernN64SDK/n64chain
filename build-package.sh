@@ -30,10 +30,11 @@ command_exists () {
 
 # Download the file URL using wget or curl (depending on which is installed)
 download () {
-  if   command_exists wget ; then wget -c  "$1"
+  if   command_exists aria2c ; then aria2c -c -s 16 -x 16 "$1"
+  elif command_exists wget ; then wget -c  "$1"
   elif command_exists curl ; then curl -LO "$1"
   else
-    echo "Install `wget` or `curl` to download toolchain sources" 1>&2
+    echo "Install `wget` or `curl` or `aria2c` to download toolchain sources" 1>&2
     return 1
   fi
 }

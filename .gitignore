@@ -17,6 +17,7 @@ tarballs
 *.rsppch
 *.tsk
 *.z64
+*.gz
 
 /*/filesystem.h
 *.swp
