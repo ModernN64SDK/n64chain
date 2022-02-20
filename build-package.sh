@@ -51,7 +51,7 @@ test -d "newlib-$NEWLIB_V"     || tar -xzf "newlib-$NEWLIB_V.tar.gz"
 
 # Compile binutils
 cd "binutils-$BINUTILS_V"
-./configure \
+CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
 	--disable-debug \
     --enable-checking=release \
     --prefix="$INSTALL_PATH" \
@@ -61,7 +61,7 @@ cd "binutils-$BINUTILS_V"
     --disable-werror
 make -j "$JOBS"
 # make install || sudo make install || su -c "make install"
-sudo checkinstall --pkgversion 2.37-1 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --pkgversion 2.37-2 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 1) outside of the source tree
@@ -91,12 +91,10 @@ make all-gcc -j "$JOBS"
 make all-target-libgcc -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -O2"
 make install-gcc || sudo make install-gcc || su -c "make install-gcc"
 make install-target-libgcc || sudo make install-target-libgcc || su -c "make install-target-libgcc"
-# sudo checkinstall --pkgversion 11.2.0-3 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
-# cp *.deb ../
 
 # Compile newlib
 cd ../"newlib-$NEWLIB_V"
-RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CXX_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-g++ AR_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ar CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -O2" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -O2" ./configure \
+RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CXX_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-g++ AR_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ar CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -fno-PIC -O2" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -fno-PIC -O2" ./configure \
     --target=mips64-elf \
     --prefix="$INSTALL_PATH" \
     --with-cpu=mips64vr4300 \
@@ -105,7 +103,7 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-werror
 make -j "$JOBS"
 # make install || sudo env PATH="$PATH" make install || su -c "env PATH=\"$PATH\" make install"
-sudo checkinstall --pkgname newlib-mips-n64 --install=no
+sudo checkinstall --pkgversion 4.1.0-2 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 2) outside of the source tree
@@ -113,7 +111,7 @@ cd ..
 rm -rf gcc_compile
 mkdir gcc_compile
 cd gcc_compile
-CFLAGS_FOR_TARGET="-O2" CXXFLAGS_FOR_TARGET="-O2" ../"gcc-$GCC_V"/configure \
+CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --prefix="$INSTALL_PATH" \
     --with-gnu-as=${INSTALL_PATH}/bin/mips-n64-as \
     --with-gnu-ld=${INSTALL_PATH}/bin/mips-n64-ld \
@@ -132,7 +130,7 @@ CFLAGS_FOR_TARGET="-O2" CXXFLAGS_FOR_TARGET="-O2" ../"gcc-$GCC_V"/configure \
     --disable-win32-registry \
     --disable-nls \
     --with-system-zlib
-make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fno-rtti -Os -fno-exceptions"
+make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -mdivide-breaks -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -fno-PIC -fno-rtti -Os -fno-exceptions"
 # make install || sudo make install || su -c "make install"
-sudo checkinstall --pkgversion 11.2.0-3 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --pkgversion 11.2.0-4 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
