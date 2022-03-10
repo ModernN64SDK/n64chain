@@ -10,6 +10,7 @@ set -eu
 # This file is subject to the terms and conditions defined in
 # 'LICENSE', which is part of this source code package.
 #
+export NEWLIB_V=3.1.0
 
 getnumproc() {
 which getconf >/dev/null 2>/dev/null && {
@@ -27,8 +28,8 @@ mkdir -p $INSTALL_PATH || sudo mkdir -p $INSTALL_PATH || su -c "mkdir -p ${INSTA
 
 export PATH=$PATH:$INSTALL_PATH/bin
 
-BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.30.tar.bz2"
-GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-10.3.0/gcc-10.3.0.tar.gz"
+BINUTILS="ftp://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.bz2"
+GCC="ftp://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.gz"
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -53,14 +54,16 @@ if [ ! -f stamps/binutils-configure ]; then
     --with-lib-path="${INSTALL_PATH}/lib" \
     --target=mips64-elf --with-arch=vr4300 \
     --program-prefix=mips-n64- \
+	--disable-debug \
     --enable-64-bit-bfd \
     --enable-plugins \
-    --enable-shared \
+    --enable-static \
+    --enable-checking=release \
     --disable-gold \
     --disable-multilib \
     --disable-nls \
     --disable-rpath \
-    --disable-static \
+    --disable-shared \
     --disable-werror
   popd
 
@@ -77,7 +80,8 @@ fi
 
 if [ ! -f stamps/binutils-install ]; then
   pushd binutils-build
-  make install-strip || sudo make install-strip || su -c "make install-strip"
+  sudo checkinstall --pkgversion 2.37-1 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+  cp *.deb ../
   popd
 
   touch stamps/binutils-install
@@ -104,6 +108,7 @@ if [ ! -f stamps/gcc-configure ]; then
     --with-gnu-as=${INSTALL_PATH}/bin/mips-n64-as \
     --with-gnu-ld=${INSTALL_PATH}/bin/mips-n64-ld \
     --enable-checking=release \
+	  --disable-debug \
     --disable-shared \
     --disable-decimal-float \
     --disable-gold \
@@ -140,13 +145,8 @@ fi
 
 if [ ! -f stamps/gcc-install ]; then
   pushd gcc-build
-  make install-strip-gcc || sudo make install-strip-gcc || su -c "make install-strip-gcc"
-  popd
-
-  # build-win32-toolchain.sh needs this; the cross-compiler build
-  # will look for mips64-elf-cc and we only have mips64-elf-gcc.
-  pushd "${INSTALL_PATH}/bin"
-  ln -sfv mips-n64-{gcc,cc} || sudo ln -sfv mips-n64-{gcc,cc} || su -c "ln -sfv mips-n64-{gcc,cc}"
+  sudo checkinstall --pkgversion 11.2.0-2 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip-gcc
+  cp *.deb ../
   popd
 
   touch stamps/gcc-install
@@ -158,9 +158,9 @@ cd gcc-build
 
 make -j${numproc} all-target-libgcc CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mdivide-breaks -O2"
 
-make install-target-libgcc || sudo make install-target-libgcc || su -c "make install-target-libgcc"
+sudo checkinstall --pkgversion 11.2.0-2 --pkgname libgcc-mips-n64 --install=no make install-target-libgcc
 
-cd ..
+cp *.deb ../
 
 rm -rf "${SCRIPT_DIR}"/tarballs
 rm -rf "${SCRIPT_DIR}"/*-source

@@ -17,6 +17,7 @@ tarballs
 *.rsppch
 *.tsk
 *.z64
+*.gz
 
 /*/filesystem.h
 *.swp
@@ -24,3 +25,4 @@ tarballs
 # macOS Garbage
 .DS_Store
 ._*
+*.deb
