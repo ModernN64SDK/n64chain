@@ -20,7 +20,7 @@ JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
 # Dependency source libs (Versions)
 BINUTILS_V=2.39
 GCC_V=12.2.0
-NEWLIB_V=4.1.0
+NEWLIB_V=4.3.0
 
 # Check if a command-line tool is available: status 0 means "yes"; status 1 means "no"
 command_exists () {
@@ -39,15 +39,22 @@ download () {
   fi
 }
 
+unzip_and_patch () {
+  tar -xJf "$1.tar.xz"
+  pushd $1
+  patch -p1 < ../$2
+  popd
+}
+
 # Dependency source: Download stage
 test -f "binutils-$BINUTILS_V.tar.xz" || download "https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_V.tar.xz"
 test -f "gcc-$GCC_V.tar.xz"           || download "https://ftp.gnu.org/gnu/gcc/gcc-$GCC_V/gcc-$GCC_V.tar.xz"
-test -f "newlib-$NEWLIB_V.tar.gz"     || download "https://sourceware.org/pub/newlib/newlib-$NEWLIB_V.tar.gz"
+test -f "newlib-$NEWLIB_V.tar.gz"     || download "https://sourceware.org/pub/newlib/newlib-4.3.0.20230120.tar.gz"
 
 # Dependency source: Extract stage
-test -d "binutils-$BINUTILS_V" || tar -xJf "binutils-$BINUTILS_V.tar.gz"
-test -d "gcc-$GCC_V"           || tar -xJf "gcc-$GCC_V.tar.gz"
-test -d "newlib-$NEWLIB_V"     || tar -xzf "newlib-$NEWLIB_V.tar.gz"
+test -d "binutils-$BINUTILS_V" || unzip_and_patch "binutils-$BINUTILS_V" "gas-vr4300.patch" 
+test -d "gcc-$GCC_V" || unzip_and_patch "gcc-$GCC_V" "gcc-vr4300.patch"
+test -d "newlib-$NEWLIB_V"     || tar -xzf "newlib-4.3.0.20230120.tar.gz"
 
 # Compile binutils
 cd "binutils-$BINUTILS_V"
@@ -102,7 +109,6 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-libssp \
     --disable-werror
 make -j "$JOBS"
-# make install || sudo env PATH="$PATH" make install || su -c "env PATH=\"$PATH\" make install"
 sudo checkinstall --pkgversion $NEWLIB_V-3 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
@@ -131,6 +137,5 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --disable-nls \
     --with-system-zlib
 make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
-# make install || sudo make install || su -c "make install"
 sudo checkinstall --pkgversion $GCC_V --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../

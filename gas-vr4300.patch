@@ -1,0 +1,90 @@
+diff --git a/gas/config/tc-mips.c b/gas/config/tc-mips.c
+index e911aaa904a..88c0af6b0bf 100644
+--- a/gas/config/tc-mips.c
++++ b/gas/config/tc-mips.c
+@@ -953,6 +953,9 @@ static int mips_fix_vr4120;
+ /* ...likewise -mfix-vr4130.  */
+ static int mips_fix_vr4130;
+ 
++/* ...likewise -mfix-vr4300. */
++static int mips_fix_vr4300;
++
+ /* ...likewise -mfix-24k.  */
+ static int mips_fix_24k;
+ 
+@@ -1518,6 +1521,8 @@ enum options
+     OPTION_NO_FIX_VR4120,
+     OPTION_FIX_VR4130,
+     OPTION_NO_FIX_VR4130,
++    OPTION_FIX_VR4300,
++    OPTION_NO_FIX_VR4300,
+     OPTION_FIX_CN63XXP1,
+     OPTION_NO_FIX_CN63XXP1,
+     OPTION_FIX_R5900,
+@@ -1666,6 +1671,10 @@ struct option md_longopts[] =
+   {"mno-fix-vr4120", no_argument, NULL, OPTION_NO_FIX_VR4120},
+   {"mfix-vr4130",    no_argument, NULL, OPTION_FIX_VR4130},
+   {"mno-fix-vr4130", no_argument, NULL, OPTION_NO_FIX_VR4130},
++  {"mfix4300", no_argument, NULL, OPTION_FIX_VR4300},
++  {"mfix-vr4300", no_argument, NULL, OPTION_FIX_VR4300},
++  {"mno-fix4300", no_argument, NULL, OPTION_NO_FIX_VR4300},
++  {"mno-fix-vr4300", no_argument, NULL, OPTION_NO_FIX_VR4300},
+   {"mfix-24k",    no_argument, NULL, OPTION_FIX_24K},
+   {"mno-fix-24k", no_argument, NULL, OPTION_NO_FIX_24K},
+   {"mfix-rm7000",    no_argument, NULL, OPTION_FIX_RM7000},
+@@ -6369,6 +6378,8 @@ classify_vr4120_insn (const char *name)
+ #define INSN_DERET	0x4200001f
+ #define INSN_DMULT	0x1c
+ #define INSN_DMULTU	0x1d
++#define INSN_MUL_S	0x46200002
++#define INSN_MUL_D	0x46000002
+ 
+ /* Return the number of instructions that must separate INSN1 and INSN2,
+    where INSN1 is the earlier instruction.  Return the worst-case value
+@@ -6419,6 +6430,23 @@ insns_between (const struct mips_cl_insn *insn1,
+ 	}
+     }
+ 
++  /* If we're working around VR4300 errata, one instruction is required
++     between a mul.s/mul.d and another multiply.  */
++  if (mips_fix_vr4300 && !mips_opts.micromips)
++    {
++      if ((insn1->insn_opcode & insn1->insn_mo->mask) == INSN_MUL_S
++	  || (insn1->insn_opcode & insn1->insn_mo->mask) == INSN_MUL_D)
++	{
++	  if (insn2 == NULL
++	      || (insn2->insn_opcode & insn2->insn_mo->mask) == INSN_MUL_S
++	      || (insn2->insn_opcode & insn2->insn_mo->mask) == INSN_MUL_D
++	      || (insn2->insn_opcode & insn2->insn_mo->mask) == INSN_DMULT
++	      || (insn2->insn_opcode & insn2->insn_mo->mask) == INSN_DMULTU
++	      || (pinfo2 & INSN_MULT) /* mult, multu */)
++	    return 1;
++	}
++    }
++
+   /* If we're working around PMC RM7000 errata, there must be three
+      nops between a dmult and a load instruction.  */
+   if (mips_fix_rm7000 && !mips_opts.micromips)
+@@ -15010,6 +15038,14 @@ md_parse_option (int c, const char *arg)
+       mips_fix_vr4130 = 0;
+       break;
+ 
++    case OPTION_FIX_VR4300:
++      mips_fix_vr4300 = 1;
++      break;
++
++    case OPTION_NO_FIX_VR4300:
++      mips_fix_vr4300 = 0;
++      break;
++
+     case OPTION_FIX_CN63XXP1:
+       mips_fix_cn63xxp1 = true;
+       break;
+@@ -20441,6 +20477,7 @@ MIPS options:\n\
+ -mno-fix-loongson3-llsc	disable work around Loongson3 LL/SC errata\n\
+ -mfix-vr4120		work around certain VR4120 errata\n\
+ -mfix-vr4130		work around VR4130 mflo/mfhi errata\n\
++-mfix-vr4300		work around VR4300 mulmul errata\n\
+ -mfix-24k		insert a nop after ERET and DERET instructions\n\
+ -mfix-cn63xxp1		work around CN63XXP1 PREF errata\n\
+ -mfix-r5900		work around R5900 short loop errata\n\
