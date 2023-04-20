@@ -18,8 +18,8 @@ JOBS="${JOBS:-`getconf _NPROCESSORS_ONLN`}"
 JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
 
 # Dependency source libs (Versions)
-BINUTILS_V=2.37
-GCC_V=11.2.0
+BINUTILS_V=2.39
+GCC_V=12.2.0
 NEWLIB_V=4.1.0
 
 # Check if a command-line tool is available: status 0 means "yes"; status 1 means "no"
@@ -40,13 +40,13 @@ download () {
 }
 
 # Dependency source: Download stage
-test -f "binutils-$BINUTILS_V.tar.gz" || download "https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_V.tar.gz"
-test -f "gcc-$GCC_V.tar.gz"           || download "https://ftp.gnu.org/gnu/gcc/gcc-$GCC_V/gcc-$GCC_V.tar.gz"
+test -f "binutils-$BINUTILS_V.tar.xz" || download "https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_V.tar.xz"
+test -f "gcc-$GCC_V.tar.xz"           || download "https://ftp.gnu.org/gnu/gcc/gcc-$GCC_V/gcc-$GCC_V.tar.xz"
 test -f "newlib-$NEWLIB_V.tar.gz"     || download "https://sourceware.org/pub/newlib/newlib-$NEWLIB_V.tar.gz"
 
 # Dependency source: Extract stage
-test -d "binutils-$BINUTILS_V" || tar -xzf "binutils-$BINUTILS_V.tar.gz"
-test -d "gcc-$GCC_V"           || tar -xzf "gcc-$GCC_V.tar.gz"
+test -d "binutils-$BINUTILS_V" || tar -xJf "binutils-$BINUTILS_V.tar.gz"
+test -d "gcc-$GCC_V"           || tar -xJf "gcc-$GCC_V.tar.gz"
 test -d "newlib-$NEWLIB_V"     || tar -xzf "newlib-$NEWLIB_V.tar.gz"
 
 # Compile binutils
@@ -61,7 +61,7 @@ CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
     --disable-werror
 make -j "$JOBS"
 # make install || sudo make install || su -c "make install"
-sudo checkinstall --pkgversion 2.37-2 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --pkgversion $BINUTILS_V --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 1) outside of the source tree
@@ -103,7 +103,7 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-werror
 make -j "$JOBS"
 # make install || sudo env PATH="$PATH" make install || su -c "env PATH=\"$PATH\" make install"
-sudo checkinstall --pkgversion 4.1.0-2 --pkgname newlib-mips-n64 --install=no
+sudo checkinstall --pkgversion $NEWLIB_V-3 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 2) outside of the source tree
@@ -132,5 +132,5 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --with-system-zlib
 make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
 # make install || sudo make install || su -c "make install"
-sudo checkinstall --pkgversion 11.2.0-4 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --pkgversion $GCC_V --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
