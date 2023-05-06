@@ -20,7 +20,7 @@ JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
 # Dependency source libs (Versions)
 BINUTILS_V=2.39
 GCC_V=12.2.0
-NEWLIB_V=4.3.0
+NEWLIB_V=4.3.0.20230120
 
 # Check if a command-line tool is available: status 0 means "yes"; status 1 means "no"
 command_exists () {
@@ -47,8 +47,8 @@ unzip_and_patch () {
 }
 
 # Dependency source: Download stage
-test -f "binutils-$BINUTILS_V.tar.xz" || download "https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_V.tar.xz"
-test -f "gcc-$GCC_V.tar.xz"           || download "https://ftp.gnu.org/gnu/gcc/gcc-$GCC_V/gcc-$GCC_V.tar.xz"
+test -f "binutils-$BINUTILS_V.tar.xz" || download "https://ftpmirror.gnu.org/gnu/binutils/binutils-$BINUTILS_V.tar.xz"
+test -f "gcc-$GCC_V.tar.xz"           || download "https://ftpmirror.gnu.org/gnu/gcc/gcc-$GCC_V/gcc-$GCC_V.tar.xz"
 test -f "newlib-$NEWLIB_V.tar.gz"     || download "https://sourceware.org/pub/newlib/newlib-4.3.0.20230120.tar.gz"
 
 # Dependency source: Extract stage
@@ -95,13 +95,13 @@ cd gcc_compile
     --disable-werror \
     --with-system-zlib
 make all-gcc -j "$JOBS"
-make all-target-libgcc -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -O2"
+make all-target-libgcc -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fwrapv -Os"
 make install-gcc || sudo make install-gcc || su -c "make install-gcc"
 make install-target-libgcc || sudo make install-target-libgcc || su -c "make install-target-libgcc"
 
 # Compile newlib
 cd ../"newlib-$NEWLIB_V"
-RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CXX_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-g++ AR_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ar CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -fno-PIC -O2" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -fno-PIC -O2" ./configure \
+RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CXX_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-g++ AR_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ar CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fwrapv -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fwrapv -Os" ./configure \
     --target=mips64-elf \
     --prefix="$INSTALL_PATH" \
     --with-cpu=mips64vr4300 \
@@ -136,6 +136,6 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --disable-win32-registry \
     --disable-nls \
     --with-system-zlib
-make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
+make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fwrapv -fno-stack-protector -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
 sudo checkinstall --pkgversion $GCC_V --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../

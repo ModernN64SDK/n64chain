@@ -9,6 +9,7 @@ tarballs
 
 binutils-*
 gcc-*
+gcc_compile
 newlib*
 
 *.a
