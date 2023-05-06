@@ -7,6 +7,10 @@ share
 *-linux-gnu
 tarballs
 
+binutils-*
+gcc-*
+newlib*
+
 *.a
 *.bin
 *.d
@@ -18,6 +22,7 @@ tarballs
 *.tsk
 *.z64
 *.gz
+*.xz
 
 /*/filesystem.h
 *.swp
@@ -26,3 +31,4 @@ tarballs
 .DS_Store
 ._*
 *.deb
+!*.patch
