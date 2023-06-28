@@ -68,7 +68,8 @@ CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
     --disable-werror
 make -j "$JOBS"
 # make install || sudo make install || su -c "make install"
-sudo checkinstall --pkgversion $BINUTILS_V --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+cp ../binutils-description.pak description.pak
+sudo checkinstall --default --pkgversion $BINUTILS_V-2 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 1) outside of the source tree
@@ -109,7 +110,8 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-libssp \
     --disable-werror
 make -j "$JOBS"
-sudo checkinstall --pkgversion $NEWLIB_V-3 --pkgname newlib-mips-n64 --install=no
+cp ../newlib-description.pak description.pak
+sudo checkinstall --default --pkgversion $NEWLIB_V-4 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 2) outside of the source tree
@@ -137,5 +139,6 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --disable-nls \
     --with-system-zlib
 make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fwrapv -fno-stack-protector -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
-sudo checkinstall --pkgversion $GCC_V --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+cp ../gcc-description.pak description.pak
+sudo checkinstall --default --pkgversion $GCC_V-2 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../

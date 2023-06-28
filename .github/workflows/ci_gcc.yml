@@ -2,7 +2,15 @@
 
 name: Build libultra
 # Build on every branch push, tag push, and pull request change:
-on: [push, pull_request_target]
+on:
+  # This action will take about 40-70 minutes to run!
+  # It is designed to only fire if the GCC toolchain build file changes.
+  push:
+    paths:
+      - 'build-package.sh'
+  pull_request:
+    paths:
+      - 'build-package.sh'
 
 jobs:
   build_repo:
@@ -33,32 +41,29 @@ jobs:
           version: 1.0
 
     - name: Build n64chain
-      run: ./.github/scripts/build-package-ci.sh
+      run: ./build-package.sh
       shell: bash
 
     - name: Get versions from toolchain file
       id: gcc-version-generator
       run: |
-        echo "BINUTILS_VERSION=$(grep -Po 'BINUTILS_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
-        echo "GCC_VERSION=$(grep -Po 'GCC_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
-        echo "NEWLIB_VERSION=$(grep -Po 'NEWLIB_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
+        echo "BINUTILS_VERSION=$(grep -Po 'BINUTILS_V=\K[^"]*' ./build-package.sh)" >> $GITHUB_OUTPUT
+        echo "GCC_VERSION=$(grep -Po 'GCC_V=\K[^"]*' ./build-package.sh)" >> $GITHUB_OUTPUT
+        echo "NEWLIB_VERSION=$(grep -Po 'NEWLIB_V=\K[^"]*' ./build-package.sh)" >> $GITHUB_OUTPUT
       continue-on-error: false
 
     - name: Upload binutils artifact
       uses: actions/upload-artifact@v3
       with:
         name: binutils-mips-n64
-        path: |
-          ${{ env }}/binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-1_amd64.deb
+        path: ./binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-2_amd64.deb
     - name: Upload gcc artifact
       uses: actions/upload-artifact@v3
       with:
         name: gcc-mips-n64
-        path: |
-          ${{ env }}/gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-1_amd64.deb
+        path: ./gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-2_amd64.deb
     - name: Upload newlib artifact
       uses: actions/upload-artifact@v3
       with:
         name: newlib-mips-n64
-        path: |
-          ${{ env }}/newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-1_amd64.deb
+        path: ./newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-4_amd64.deb
