@@ -1,7 +1,6 @@
 # CI file
 
-name: Build libultra
-# Build on every branch push, tag push, and pull request change:
+name: Build n64chain
 on:
   # This action will take about 40-70 minutes to run!
   # It is designed to only fire if the GCC toolchain build file changes.
