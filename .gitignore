@@ -33,3 +33,4 @@ newlib*
 ._*
 *.deb
 !*.patch
+!*-description.pak
