@@ -3,15 +3,7 @@
 name: Build libultra
 
 # Build on every branch push, tag push, and pull request change:
-on:
-  # This action will take about 40-70 minutes to run!
-  # It is designed to only fire if the GCC toolchain build file changes.
-  push:
-    paths:
-      - '.github/scripts/build-package-ci.sh'
-  pull_request:
-    paths:
-      - '.github/scripts/build-package-ci.sh'
+  on: [push, pull_request_target]
 
 jobs:
   build_repo:
@@ -38,7 +30,7 @@ jobs:
     - name: Install SDK packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-          packages: build-essential python3 wget m4 flex bison texinfo libgmp-dev libmpfr-dev libmpc-dev libisl-dev
+          packages: build-essential python3 checkinstall wget m4 flex bison texinfo libgmp-dev libmpfr-dev libmpc-dev libisl-dev
           version: 1.0
 
     - name: Build n64chain
@@ -59,19 +51,3 @@ jobs:
         name: binutils-mips-n64
         path: |
           ${{ env }}/binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-1_amd64.deb
-
-
-    - name: Upload gcc artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: gcc-mips-n64
-        path: |
-          ${{ env }}/gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-1_amd64.deb
-
-
-    - name: Upload newlib artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: newlib-mips-n64
-        path: |
-          ${{ env }}/newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-1_amd64.deb
