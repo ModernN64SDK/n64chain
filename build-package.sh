@@ -17,6 +17,8 @@ export PATH="$PATH:$INSTALL_PATH/bin"
 JOBS="${JOBS:-`getconf _NPROCESSORS_ONLN`}"
 JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
 
+echo $JOBS
+
 # Dependency source libs (Versions)
 BINUTILS_V=2.39
 GCC_V=12.2.0
