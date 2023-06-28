@@ -39,9 +39,9 @@ jobs:
     - name: Get versions from toolchain file
       id: gcc-version-generator
       run: |
-        echo "BINUTILS_VERSION=$(grep -Po 'BINUTILS_V=\K[^"]*' ./tools/build-toolchain.sh)" >> $GITHUB_OUTPUT
-        echo "GCC_VERSION=$(grep -Po 'GCC_V=\K[^"]*' ./tools/build-toolchain.sh)" >> $GITHUB_OUTPUT
-        echo "NEWLIB_VERSION=$(grep -Po 'NEWLIB_V=\K[^"]*' ./tools/build-toolchain.sh)" >> $GITHUB_OUTPUT
+        echo "BINUTILS_VERSION=$(grep -Po 'BINUTILS_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
+        echo "GCC_VERSION=$(grep -Po 'GCC_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
+        echo "NEWLIB_VERSION=$(grep -Po 'NEWLIB_V=\K[^"]*' ./.github/scripts/build-package-ci.sh)" >> $GITHUB_OUTPUT
       continue-on-error: false
 
     - name: Upload binutils artifact
@@ -50,3 +50,15 @@ jobs:
         name: binutils-mips-n64
         path: |
           ${{ env }}/binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-1_amd64.deb
+    - name: Upload gcc artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gcc-mips-n64
+        path: |
+          ${{ env }}/gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-1_amd64.deb
+    - name: Upload newlib artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: newlib-mips-n64
+        path: |
+          ${{ env }}/newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-1_amd64.deb

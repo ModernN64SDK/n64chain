@@ -71,3 +71,74 @@ make -j "$JOBS"
 cp ../binutils-description.pak description.pak
 sudo checkinstall --default --pkgversion $BINUTILS_V --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
+
+# Compile GCC for MIPS N64 (pass 1) outside of the source tree
+cd ..
+rm -rf gcc_compile
+mkdir gcc_compile
+cd gcc_compile
+../"gcc-$GCC_V"/configure \
+    --prefix="$INSTALL_PATH" \
+    --target=mips64-elf \
+    --program-prefix=mips-n64- \
+    --with-arch=vr4300 \
+    --with-tune=vr4300 \
+    --enable-languages=c \
+    --without-headers \
+    --with-newlib \
+    --disable-libssp \
+    --disable-multilib \
+    --disable-shared \
+    --with-gcc \
+    --disable-threads \
+    --disable-win32-registry \
+    --disable-nls \
+    --disable-werror \
+    --with-system-zlib
+make all-gcc -j "$JOBS"
+make all-target-libgcc -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fwrapv -Os"
+make install-gcc || sudo make install-gcc || su -c "make install-gcc"
+make install-target-libgcc || sudo make install-target-libgcc || su -c "make install-target-libgcc"
+
+# Compile newlib
+cd ../"newlib-$NEWLIB_V"
+RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-gcc CXX_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-g++ AR_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ar CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fwrapv -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fwrapv -Os" ./configure \
+    --target=mips64-elf \
+    --prefix="$INSTALL_PATH" \
+    --with-cpu=mips64vr4300 \
+    --disable-threads \
+    --disable-libssp \
+    --disable-werror
+make -j "$JOBS"
+cp ../newlib-description.pak description.pak
+sudo checkinstall --default --pkgversion $NEWLIB_V-3 --pkgname newlib-mips-n64 --install=no
+cp *.deb ../
+
+# Compile GCC for MIPS N64 (pass 2) outside of the source tree
+cd ..
+rm -rf gcc_compile
+mkdir gcc_compile
+cd gcc_compile
+CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
+    --prefix="$INSTALL_PATH" \
+    --with-gnu-as=${INSTALL_PATH}/bin/mips-n64-as \
+    --with-gnu-ld=${INSTALL_PATH}/bin/mips-n64-ld \
+    --enable-checking=release \
+    --program-prefix=mips-n64- \
+    --target=mips64-elf \
+    --with-arch=vr4300 \
+    --with-tune=vr4300 \
+    --enable-languages=c,c++ \
+    --with-newlib \
+    --disable-libssp \
+    --disable-multilib \
+    --disable-shared \
+    --with-gcc \
+    --disable-threads \
+    --disable-win32-registry \
+    --disable-nls \
+    --with-system-zlib
+make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fwrapv -fno-stack-protector -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
+cp ../gcc-description.pak description.pak
+sudo checkinstall --default --pkgversion $GCC_V --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+cp *.deb ../
