@@ -8,7 +8,7 @@
 # Exit on error
 set -e
 
-# Set N64_INST before calling the script to change the default installation directory path
+# Set INSTALL_PATH before calling the script to change the default installation directory path
 INSTALL_PATH="/opt/crashsdk"
 # Set PATH for newlib to compile using GCC for MIPS N64 (pass 1)
 export PATH="$PATH:$INSTALL_PATH/bin"
