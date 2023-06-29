@@ -16,7 +16,6 @@ export PATH="$PATH:$INSTALL_PATH/bin"
 # Determine how many parallel Make jobs to run based on CPU count
 JOBS="${JOBS:-`getconf _NPROCESSORS_ONLN`}"
 JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
-
 echo $JOBS
 
 # Dependency source libs (Versions)
