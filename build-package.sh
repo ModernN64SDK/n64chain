@@ -57,6 +57,11 @@ test -d "binutils-$BINUTILS_V" || unzip_and_patch "binutils-$BINUTILS_V" "gas-vr
 test -d "gcc-$GCC_V" || unzip_and_patch "gcc-$GCC_V" "gcc-vr4300.patch"
 test -d "newlib-$NEWLIB_V"     || tar -xzf "newlib-4.3.0.20230120.tar.gz"
 
+# Download prereqs
+cd "gcc-$GCC_V"
+./contrib/download_prerequisites
+cd ..
+
 # Compile binutils
 cd "binutils-$BINUTILS_V"
 CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
@@ -70,8 +75,9 @@ CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
 make -j "$JOBS"
 # make install || sudo make install || su -c "make install"
 cp ../binutils-description.pak description.pak
-sudo checkinstall --default --pkgversion $BINUTILS_V-2 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --default --pkgversion $BINUTILS_V-3 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
+
 
 # Compile GCC for MIPS N64 (pass 1) outside of the source tree
 cd ..
@@ -112,7 +118,7 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-werror
 make -j "$JOBS"
 cp ../newlib-description.pak description.pak
-sudo checkinstall --default --pkgversion $NEWLIB_V-4 --pkgname newlib-mips-n64 --install=no
+sudo checkinstall --default --pkgversion $NEWLIB_V-5 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 2) outside of the source tree
@@ -141,5 +147,5 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --with-system-zlib
 make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fwrapv -fno-stack-protector -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
 cp ../gcc-description.pak description.pak
-sudo checkinstall --default --pkgversion $GCC_V-2 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --default --pkgversion $GCC_V-3 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
