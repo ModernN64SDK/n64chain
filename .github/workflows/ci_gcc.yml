@@ -60,7 +60,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: gcc-mips-n64
-        path: ./gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-3-1_amd64.deb
+        path: ./gcc-mips-n64_${{ steps.gcc-version-generator.outputs.GCC_VERSION }}-1-1_amd64.deb
     - name: Upload newlib artifact
       uses: actions/upload-artifact@v3
       with:

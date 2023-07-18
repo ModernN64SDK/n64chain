@@ -20,7 +20,7 @@ echo $JOBS
 
 # Dependency source libs (Versions)
 BINUTILS_V=2.39
-GCC_V=12.2.0
+GCC_V=13.1.0
 NEWLIB_V=4.3.0.20230120
 
 # Check if a command-line tool is available: status 0 means "yes"; status 1 means "no"
@@ -147,5 +147,5 @@ CFLAGS="-O2" CXXFLAGS="-O2" ../"gcc-$GCC_V"/configure \
     --with-system-zlib
 make -j "$JOBS" CFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-PIC -fwrapv -fno-stack-protector -mno-check-zero-division -Os" CXXFLAGS_FOR_TARGET="-mabi=32 -ffreestanding -mfix4300 -G 0 -fno-stack-protector -mno-check-zero-division -fno-PIC -fno-rtti -Os -fno-exceptions"
 cp ../gcc-description.pak description.pak
-sudo checkinstall --default --pkgversion $GCC_V-3 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --default --pkgversion $GCC_V-1 --pkgname gcc-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
