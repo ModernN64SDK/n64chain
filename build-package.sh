@@ -4,7 +4,6 @@
 # which was licensed under the Unlicense.
 # (c) 2012-2021 DragonMinded and libDragon Contributors.
 
-
 # Exit on error
 set -e
 

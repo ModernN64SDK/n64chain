@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: binutils-mips-n64
-        path: ./binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-3-1_amd64.deb
+        path: ./binutils-mips-n64_${{ steps.gcc-version-generator.outputs.BINUTILS_VERSION }}-1-1_amd64.deb
     - name: Upload gcc artifact
       uses: actions/upload-artifact@v3
       with:
@@ -65,4 +65,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: newlib-mips-n64
-        path: ./newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-5-1_amd64.deb
+        path: ./newlib-mips-n64_${{ steps.gcc-version-generator.outputs.NEWLIB_VERSION }}-6-1_amd64.deb
