@@ -19,8 +19,8 @@ JOBS="${JOBS:-1}" # If getconf returned nothing, default to 1
 echo $JOBS
 
 # Dependency source libs (Versions)
-BINUTILS_V=2.39
-GCC_V=13.1.0
+BINUTILS_V=2.41
+GCC_V=13.2.0
 NEWLIB_V=4.3.0.20230120
 
 # Check if a command-line tool is available: status 0 means "yes"; status 1 means "no"
@@ -75,7 +75,7 @@ CFLAGS="-O2" CXXFLAGS="-O2" ./configure \
 make -j "$JOBS"
 # make install || sudo make install || su -c "make install"
 cp ../binutils-description.pak description.pak
-sudo checkinstall --default --pkgversion $BINUTILS_V-3 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
+sudo checkinstall --default --pkgversion $BINUTILS_V-1 --pkgname binutils-mips-n64 --exclude=/opt/crashsdk/share/info --install=no make install-strip
 cp *.deb ../
 
 
@@ -118,7 +118,7 @@ RANLIB_FOR_TARGET=${INSTALL_PATH}/bin/mips-n64-ranlib CC_FOR_TARGET=${INSTALL_PA
     --disable-werror
 make -j "$JOBS"
 cp ../newlib-description.pak description.pak
-sudo checkinstall --default --pkgversion $NEWLIB_V-5 --pkgname newlib-mips-n64 --install=no
+sudo checkinstall --default --pkgversion $NEWLIB_V-6 --pkgname newlib-mips-n64 --install=no
 cp *.deb ../
 
 # Compile GCC for MIPS N64 (pass 2) outside of the source tree
